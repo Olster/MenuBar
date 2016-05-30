@@ -13,25 +13,48 @@ class AppDelegate: NSObject, NSApplicationDelegate, StatusTextReceiver {
     @IBOutlet weak var menu: NSMenu!
     
     let statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(NSVariableStatusItemLength)
-    var statusItemButton: NSButton?
     
-    let textProvider = StatusTextProvider(pathToFolder: NSBundle.mainBundle().resourcePath!)
+    var textProvider: StatusTextProvider!
     var menuHandler: MenuHandler!
     
+    var appSupportDir: NSURL!
+    
     func applicationDidFinishLaunching(aNotification: NSNotification) {
-        statusItemButton = statusItem.button
-        guard statusItemButton != nil else {
+        statusItem.menu = menu
+        guard statusItem.button != nil else {
             NSLog("Can't get menuButton")
             return
         }
         
-        //statusItemButton?.title = "Hello"
-        statusItem.menu = menu
+        guard setUpApplicationSupportDir() else {
+            return
+        }
         
-        menuHandler = MenuHandler(pathToFolder: NSBundle.mainBundle().resourcePath!, menu: menu)
+        textProvider = StatusTextProvider(pathToFolder: appSupportDir.path!)
+        menuHandler = MenuHandler(pathToFolder: appSupportDir.path!, menu: menu)
         
         textProvider.setTextReceiver(self)
         textProvider.start()
+    }
+    
+    func setUpApplicationSupportDir() -> Bool {
+        let bundleID = NSBundle.mainBundle().bundleIdentifier
+        let appSupport = NSFileManager.defaultManager().URLsForDirectory(.ApplicationSupportDirectory, inDomains: .UserDomainMask)
+        
+        if bundleID != nil && appSupport.count > 0 {
+            let dir = appSupport[0].URLByAppendingPathComponent(bundleID!)
+            
+            do {
+                try NSFileManager.defaultManager().createDirectoryAtURL(dir, withIntermediateDirectories: true, attributes: nil)
+                appSupportDir = dir
+                return true
+            } catch {
+                NSLog("Can't create application support dir: \(dir). Err: \(error)")
+            }
+        }
+        
+        NSLog("Can't set up appSupportDir: '\(bundleID)', '\(appSupport)'")
+        return false
     }
     
     @IBAction func onQuit(sender: NSMenuItem) {
@@ -74,7 +97,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, StatusTextReceiver {
             
             AskHandler.ask(cmd)
         case .Text:
-            statusItemButton?.title = command.text
+            statusItem.button?.title = command.text
         }
     }
 }
