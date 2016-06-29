@@ -9,12 +9,15 @@
 import Cocoa
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, StatusTextReceiver {
+class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate {
     @IBOutlet weak var menu: NSMenu!
     
     let statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(NSVariableStatusItemLength)
     
-    var textProvider: StatusTextProvider!
+    // Reads commands from user.
+    var textProvider: CommandProvider!
+    
+    // Handles menus created ny user.
     var menuHandler: MenuHandler!
     
     var appSupportDir: NSURL!
@@ -30,10 +33,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, StatusTextReceiver {
             return
         }
         
-        textProvider = StatusTextProvider(pathToFolder: appSupportDir.path!)
+        textProvider = CommandProvider(pathToFolder: appSupportDir.path!)
         menuHandler = MenuHandler(pathToFolder: appSupportDir.path!, menu: menu)
         
-        textProvider.setTextReceiver(self)
+        textProvider.delegate = self
         textProvider.start()
     }
     
@@ -63,8 +66,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, StatusTextReceiver {
         //NSApplication.sharedApplication().terminate(self)
     }
     
-    // StatusTextReceiver impl.
-    func textDidUpdate(text: String) {
+    // MARK: - CommandProviderDelegate impl.
+    func commandReceived(text: String) {
         let trimmed = text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         
         let lines = trimmed.componentsSeparatedByString("\n")

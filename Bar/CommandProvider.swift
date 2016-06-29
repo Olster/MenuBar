@@ -8,19 +8,20 @@
 
 import Foundation
 
-protocol StatusTextReceiver {
-    func textDidUpdate(text: String)
+protocol CommandProviderDelegate {
+    func commandReceived(text: String)
 }
 
-class StatusTextProvider {
-    let scriptName = "default.sh"
-    let inputFifoName = "appStatus"
+class CommandProvider {
+    private let scriptName = "default.sh"
+    private let inputFifoName = "commandSink"
     
-    var delegate: StatusTextReceiver?
-    let scriptRunner = NSTask()
-    let pathToFolder: String
+    private let scriptRunner = NSTask()
+    private let pathToFolder: String
     
-    var inputFifoHandle: NSFileHandle?
+    private var inputFifoHandle: NSFileHandle?
+    
+    var delegate: CommandProviderDelegate?
     
     var scriptPID: Int32 {
         return scriptRunner.processIdentifier
@@ -28,23 +29,13 @@ class StatusTextProvider {
     
     init(pathToFolder: String) {
         self.pathToFolder = pathToFolder
-        
-        if !NSFileManager.defaultManager().fileExistsAtPath(pathToFolder) {
-            NSLog("Path to resource folder is invalid: '\(pathToFolder)'")
-            return
-        }
-        
-        print("Setting task path: " + pathToFolder)
+        print("Setting task path: \(pathToFolder)")
         scriptRunner.currentDirectoryPath = pathToFolder
         scriptRunner.launchPath = "/bin/bash"
     }
     
     deinit {
         scriptRunner.terminate()
-    }
-    
-    func setTextReceiver(obj: StatusTextReceiver) {
-        delegate = obj
     }
     
     func start() -> Bool {
@@ -98,7 +89,7 @@ class StatusTextProvider {
     
     private func statusReadHandler(handle: NSFileHandle) {
         if let input = String(data: handle.availableData, encoding: NSUTF8StringEncoding) {
-            delegate?.textDidUpdate(input)
+            delegate?.commandReceived(input)
         }
     }
 }
