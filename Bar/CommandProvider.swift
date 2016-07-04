@@ -14,7 +14,7 @@ protocol CommandProviderDelegate {
 
 class CommandProvider {
     private let scriptName = "default.sh"
-    private let inputFifoName = "commandSink"
+    private let inputFifoName = "appStatus"
     
     private let scriptRunner = NSTask()
     private let pathToFolder: String
@@ -41,8 +41,7 @@ class CommandProvider {
     func start() -> Bool {
         // Set up script runner.
         let script = String(format: "%@/%@", pathToFolder, scriptName)
-        guard NSFileManager.defaultManager().fileExistsAtPath(script) else {
-            NSLog("default.sh doesn't exist in \(script). Can't start task")
+        guard setupScript(script) else {
             return false
         }
         
@@ -75,6 +74,33 @@ class CommandProvider {
         return true
     }
     
+    private func setupScript(path: String) -> Bool {
+        if !NSFileManager.defaultManager().fileExistsAtPath(path) {
+            NSLog("default.sh doesn't exist in '\(path)'. Copying from resources.")
+            
+            guard let defaultScript = NSBundle.mainBundle().pathForResource("default", ofType: "sh") else {
+                NSLog("No default.sh in resources")
+                return false
+            }
+            
+            do {
+                try NSFileManager.defaultManager().copyItemAtPath(defaultScript, toPath: path)
+            } catch {
+                NSLog("Can't copy default script: \(error)")
+                return false
+            }
+        }
+        
+        return true
+    }
+    
+    private func setupFifo(path: String) -> Bool {
+        if !NSFileManager.defaultManager().fileExistsAtPath(path) {
+            NSLog("\(inputFifoName) doesn't exist in \(pathToFolder). Can't start task")
+            return false
+        }
+    }
+    
     private func outReadHandler(handle: NSFileHandle) {
         if let out = String(data: handle.availableData, encoding: NSUTF8StringEncoding) {
             NSLog("Script out: " + out)
@@ -91,5 +117,28 @@ class CommandProvider {
         if let input = String(data: handle.availableData, encoding: NSUTF8StringEncoding) {
             delegate?.commandReceived(input)
         }
+    }
+    
+    // MARK: - FIFO related.
+    private func isFifo(path: String) -> Bool {
+        guard let handle = NSFileHandle(forReadingAtPath: path) else {
+            let fn = #function
+            NSLog("\(fn): 'path' does not exist")
+            return false
+        }
+        
+        let ret = isFifo(handle.fileDescriptor)
+        handle.closeFile()
+        return ret
+    }
+    
+    private func isFifo(descriptor: Int32) -> Bool {
+        var statPtr = stat()
+        guard fstat(descriptor, &statPtr) == 0 else {
+            NSLog("fstat failed: \(errno)")
+            return false
+        }
+        
+        return (statPtr.st_mode & S_IFIFO) == 1
     }
 }
