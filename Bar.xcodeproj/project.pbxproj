@@ -7,10 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F424F1B31CDB73DF00A7FA66 /* AskWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = F424F1B21CDB73DF00A7FA66 /* AskWindow.xib */; };
-		F426B99F1CD0EB7300DF63B8 /* NotifyHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F426B99E1CD0EB7300DF63B8 /* NotifyHandler.swift */; };
 		F426B9A11CD0F98E00DF63B8 /* Command.swift in Sources */ = {isa = PBXBuildFile; fileRef = F426B9A01CD0F98E00DF63B8 /* Command.swift */; };
-		F426B9A51CD2442B00DF63B8 /* AskHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F426B9A41CD2442B00DF63B8 /* AskHandler.swift */; };
 		F482F29F1CC7B1FF00759523 /* CommandProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F482F29E1CC7B1FF00759523 /* CommandProvider.swift */; };
 		F482F2A11CC7C42000759523 /* default.sh in Resources */ = {isa = PBXBuildFile; fileRef = F482F2A01CC7C42000759523 /* default.sh */; };
 		F482F2BC1CC9065A00759523 /* MenuHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F482F2BB1CC9065A00759523 /* MenuHandler.swift */; };
@@ -20,10 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		F424F1B21CDB73DF00A7FA66 /* AskWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AskWindow.xib; sourceTree = "<group>"; };
-		F426B99E1CD0EB7300DF63B8 /* NotifyHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotifyHandler.swift; sourceTree = "<group>"; };
 		F426B9A01CD0F98E00DF63B8 /* Command.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Command.swift; sourceTree = "<group>"; };
-		F426B9A41CD2442B00DF63B8 /* AskHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AskHandler.swift; sourceTree = "<group>"; };
 		F482F29E1CC7B1FF00759523 /* CommandProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommandProvider.swift; sourceTree = "<group>"; };
 		F482F2A01CC7C42000759523 /* default.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = default.sh; sourceTree = "<group>"; };
 		F482F2BB1CC9065A00759523 /* MenuHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuHandler.swift; sourceTree = "<group>"; };
@@ -56,9 +50,6 @@
 		F426B9A31CD243F500DF63B8 /* Handlers */ = {
 			isa = PBXGroup;
 			children = (
-				F426B99E1CD0EB7300DF63B8 /* NotifyHandler.swift */,
-				F426B9A41CD2442B00DF63B8 /* AskHandler.swift */,
-				F424F1B21CDB73DF00A7FA66 /* AskWindow.xib */,
 				F482F2BB1CC9065A00759523 /* MenuHandler.swift */,
 			);
 			name = Handlers;
@@ -154,7 +145,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4D614C11CC79FAA00F5C7F8 /* Assets.xcassets in Resources */,
-				F424F1B31CDB73DF00A7FA66 /* AskWindow.xib in Resources */,
 				F4D614C41CC79FAA00F5C7F8 /* MainMenu.xib in Resources */,
 				F482F2A11CC7C42000759523 /* default.sh in Resources */,
 			);
@@ -168,8 +158,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4D614BF1CC79FAA00F5C7F8 /* AppDelegate.swift in Sources */,
-				F426B99F1CD0EB7300DF63B8 /* NotifyHandler.swift in Sources */,
-				F426B9A51CD2442B00DF63B8 /* AskHandler.swift in Sources */,
 				F482F2BC1CC9065A00759523 /* MenuHandler.swift in Sources */,
 				F426B9A11CD0F98E00DF63B8 /* Command.swift in Sources */,
 				F482F29F1CC7B1FF00759523 /* CommandProvider.swift in Sources */,

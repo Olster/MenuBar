@@ -34,10 +34,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate {
         }
         
         textProvider = CommandProvider(pathToFolder: appSupportDir.path!)
-        menuHandler = MenuHandler(pathToFolder: appSupportDir.path!, menu: menu)
-        
         textProvider.delegate = self
         textProvider.start()
+        
+        menuHandler = MenuHandler(pathToFolder: appSupportDir.path!, menu: menu)
     }
     
     func setUpApplicationSupportDir() -> Bool {
@@ -66,6 +66,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate {
         //NSApplication.sharedApplication().terminate(self)
     }
     
+    @IBAction func onOpenScriptsFolder(sender: NSMenuItem) {
+        NSWorkspace.sharedWorkspace().openURL(appSupportDir)
+    }
+    
     // MARK: - CommandProviderDelegate impl.
     func commandReceived(text: String) {
         let trimmed = text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
@@ -85,22 +89,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate {
     
     private func handleCommand(command: Command) {
         switch command.type() {
-        case .Notify:
-            guard let cmd = command as? NotifyCommand else {
-                NSLog("Invalid command: \(command)")
-                return
-            }
-            
-            NotifyHandler.notify(cmd)
-        case .Ask:            
-            guard let cmd = command as? AskCommand else {
-                NSLog("Invalid command: \(command)")
-                return
-            }
-            
-            AskHandler.ask(cmd)
         case .Text:
-            statusItem.button?.title = command.text
+            guard let cmd = command as? TextCommand else {
+                NSLog("Invalid command: \(command)")
+                return
+            }
+            
+            statusItem.button?.title = cmd.text
+            
+        default:
+            command.run()
         }
     }
 }

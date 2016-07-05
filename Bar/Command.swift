@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Cocoa
 
 // Specification of commands:
 // General description:
@@ -17,7 +18,7 @@ import Foundation
 // Optional:
 // arg1Name - name of the first argument
 // arg1 - first argument
-// There can be as many arguments as needed, all of them must be separated by '\v' character
+// There can be as many arguments as needed, all of them must be separated by '\t' character
 class CommandFactory {
     static private let commandCreators = ["notify:": CommandFactory.createNotifyCommand,
                                           "ask:": CommandFactory.createAskCommand]
@@ -60,12 +61,12 @@ class CommandFactory {
     }
     
     static private func createTextCommand(line: String) -> Command? {
-        return Command(line)
+        return TextCommand(line)
     }
     
     static private func createNotifyCommand(line: String) -> Command? {
         let dict = splitToDictionary(line)
-        let cmd = NotifyCommand(line)
+        let cmd = NotifyCommand()
         
         if let title = dict["notify"] {
             cmd.title = title
@@ -82,8 +83,7 @@ class CommandFactory {
     
     static private func createAskCommand(line: String) -> Command? {
         let dict = splitToDictionary(line)
-        
-        let cmd = AskCommand(line)
+        let cmd = AskCommand()
         
         if let title = dict["ask"] {
             cmd.title = title
@@ -99,22 +99,31 @@ class CommandFactory {
     }
 }
 
-class Command {
+// MARK: - Command implementations.
+enum SupportedCommands {
+    case Notify
+    case Ask
+    case Text
+}
+
+protocol Command {
+    func type() -> SupportedCommands
+    func run() -> Bool
+}
+
+class TextCommand: Command {
     var text: String
-    
-    enum SupportedCommands {
-        case Notify
-        case Ask
-        case Text
-    }
     
     init(_ text: String) {
         self.text = text
     }
     
-    // Must be overriden by subclasses.
     func type() -> SupportedCommands {
         return .Text
+    }
+    
+    func run() -> Bool {
+        return true
     }
 }
 
@@ -123,8 +132,21 @@ class NotifyCommand: Command {
     var informativeText: String?
     var makeSound = false
     
-    override func type() -> Command.SupportedCommands {
+    func type() -> SupportedCommands {
         return .Notify
+    }
+    
+    func run() -> Bool {
+        let notification = NSUserNotification()
+        notification.title = title
+        notification.informativeText = informativeText
+        
+        if makeSound {
+            notification.soundName = NSUserNotificationDefaultSoundName
+        }
+        
+        NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
+        return true
     }
 }
 
@@ -133,7 +155,24 @@ class AskCommand: Command {
     var informativeText: String?
     var protected = false
     
-    override func type() -> Command.SupportedCommands {
+    func type() -> SupportedCommands {
         return .Ask
+    }
+    
+    func run() -> Bool {
+        let alert = NSAlert()
+        alert.addButtonWithTitle("OK")
+        alert.addButtonWithTitle("Cancel")
+        alert.messageText = title
+        alert.informativeText = informativeText ?? ""
+        alert.alertStyle = .InformationalAlertStyle
+        
+        let rect = NSMakeRect(0, 0, 250, 25)
+        let input = protected ? NSSecureTextField(frame: rect) : NSTextField(frame: rect)
+        
+        alert.accessoryView = input
+        
+        // TODO: Will this suffice?
+        return alert.runModal() == NSAlertFirstButtonReturn
     }
 }

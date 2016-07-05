@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -20,6 +20,13 @@
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <menu id="Joh-wd-L8o">
             <items>
+                <menuItem title="Open scripts folder" id="SAV-ET-XWO">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="onOpenScriptsFolder:" target="Voe-Tx-rLC" id="Q0K-ZZ-btv"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="2cn-Lv-JeD"/>
                 <menuItem title="Quit" id="Pl9-De-Cik">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>

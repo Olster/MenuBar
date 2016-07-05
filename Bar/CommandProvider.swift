@@ -58,8 +58,8 @@ class CommandProvider {
         
         // Set up fifo.
         let statusFifoPath = String(format: "%@/%@", pathToFolder, inputFifoName)
-        guard NSFileManager.defaultManager().fileExistsAtPath(statusFifoPath) else {
-            NSLog("\(inputFifoName) doesn't exist in \(pathToFolder). Can't start task")
+        guard setupFifo(statusFifoPath) else {
+            NSLog("Failed to set up FIFO")
             return false
         }
         
@@ -96,9 +96,19 @@ class CommandProvider {
     
     private func setupFifo(path: String) -> Bool {
         if !NSFileManager.defaultManager().fileExistsAtPath(path) {
-            NSLog("\(inputFifoName) doesn't exist in \(pathToFolder). Can't start task")
+            NSLog("\(inputFifoName) doesn't exist in \(pathToFolder). Creating fifo")
+            
+            if !createFifo(path) {
+                return false
+            }
+        }
+        
+        if !isFifo(path) {
+            NSLog("\(path) isn't a FIFO.")
             return false
         }
+        
+        return true
     }
     
     private func outReadHandler(handle: NSFileHandle) {
@@ -121,24 +131,25 @@ class CommandProvider {
     
     // MARK: - FIFO related.
     private func isFifo(path: String) -> Bool {
-        guard let handle = NSFileHandle(forReadingAtPath: path) else {
-            let fn = #function
-            NSLog("\(fn): 'path' does not exist")
+        let cs = (path as NSString).UTF8String
+        var statPtr = stat()
+        let res = stat(cs, &statPtr)
+        if res != 0 {
+            NSLog("stat() returned \(res), errno: \(errno)")
             return false
         }
         
-        let ret = isFifo(handle.fileDescriptor)
-        handle.closeFile()
-        return ret
+        return (statPtr.st_mode & S_IFMT) == S_IFIFO
     }
     
-    private func isFifo(descriptor: Int32) -> Bool {
-        var statPtr = stat()
-        guard fstat(descriptor, &statPtr) == 0 else {
-            NSLog("fstat failed: \(errno)")
+    private func createFifo(path: String) -> Bool {
+        let cs = (path as NSString).UTF8String
+        let res = mkfifo(cs, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
+        if res != 0 {
+            NSLog("mkfifo returned \(res), errno: \(errno)")
             return false
         }
         
-        return (statPtr.st_mode & S_IFIFO) == 1
+        return true
     }
 }
