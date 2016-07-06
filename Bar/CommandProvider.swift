@@ -14,7 +14,7 @@ protocol CommandProviderDelegate {
 
 class CommandProvider {
     private let scriptName = "default.sh"
-    private let inputFifoName = "appStatus"
+    private let inputFifoName = "menubar_fifo"
     
     private let scriptRunner = NSTask()
     private let pathToFolder: String
