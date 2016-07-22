@@ -6,9 +6,9 @@
 #  Copyright © 2016 Pavlo Denysiuk. All rights reserved.
 
 # Available commands for sending to menubar_fifo:
-# text - just updates text in status bar with text. If text has newlines
-#        first line is shows in status bar. Other lines are shown as menu item.
-# Example: printf "First line\n`date`\nThird line" > menubar_fifo
+# text - just updates text in status bar with text.
+# Example:
+# date > menubar_fifo
 #
 # -----------------------------------------------------------------------------
 #
@@ -18,7 +18,7 @@
 # -----------------------------------------------------------------------------
 #
 # icon:path -- sets an icon in status bar from png image in path.
-#              Preferable resolutions: 16x16, 24x24, 32x32,
+#              Preferable resolution: 32x32.
 # Example: echo "icon:~/Documents/icon.png" > menubar_fifo
 #
 # -----------------------------------------------------------------------------

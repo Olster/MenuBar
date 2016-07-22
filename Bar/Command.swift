@@ -21,16 +21,17 @@ import Cocoa
 // There can be as many arguments as needed, all of them must be separated by '\t' character
 class CommandFactory {
     static private let commandCreators = ["notify:": CommandFactory.createNotifyCommand,
-                                          "ask:": CommandFactory.createAskCommand]
+                                          "ask:": CommandFactory.createAskCommand,
+                                          "icon:": CommandFactory.createIconCommand]
     
-    static func createFromLine(line: String) -> Command? {
+    static func createFromLine(line: String, scriptsDir: String) -> Command? {
         for (prefix, handler) in commandCreators {
             if line.hasPrefix(prefix) {
-                return handler(line)
+                return handler(line, scriptsDir: scriptsDir)
             }
         }
         
-        return createTextCommand(line)
+        return createTextCommand(line, scriptsDir: scriptsDir)
     }
     
     static private func splitToDictionary(input: String) -> [String: String] {
@@ -53,18 +54,19 @@ class CommandFactory {
     
     static private func convertToBool(str: String) -> Bool {        
         switch str {
-        case "YES", "true", "1", "+":
+        case "YES", "true", "1":
             return true
         default:
             return false
         }
     }
     
-    static private func createTextCommand(line: String) -> Command? {
+    // MARK: - Creators of different command types.
+    static private func createTextCommand(line: String, scriptsDir: String) -> Command? {
         return TextCommand(line)
     }
     
-    static private func createNotifyCommand(line: String) -> Command? {
+    static private func createNotifyCommand(line: String, scriptsDir: String) -> Command? {
         let dict = splitToDictionary(line)
         let cmd = NotifyCommand()
         
@@ -81,9 +83,9 @@ class CommandFactory {
         return cmd
     }
     
-    static private func createAskCommand(line: String) -> Command? {
+    static private func createAskCommand(line: String, scriptsDir: String) -> Command? {
         let dict = splitToDictionary(line)
-        let cmd = AskCommand()
+        let cmd = AskCommand(scriptsDir: scriptsDir)
         
         if let title = dict["ask"] {
             cmd.title = title
@@ -97,6 +99,24 @@ class CommandFactory {
         
         return cmd
     }
+    
+    static private func createIconCommand(line: String, scriptsDir: String) -> Command? {
+        let dict = splitToDictionary(line)
+        if let imgString = dict["icon"] {
+            let cmd = IconCommand(imagePath: imgString)
+            if let width = dict["width"] {
+                cmd.width = Int(width) ?? 0
+            }
+            
+            if let height = dict["height"] {
+                cmd.height = Int(height) ?? 0
+            }
+            
+            return cmd
+        }
+        
+        return nil
+    }
 }
 
 // MARK: - Command implementations.
@@ -104,6 +124,7 @@ enum SupportedCommands {
     case Notify
     case Ask
     case Text
+    case Icon
 }
 
 protocol Command {
@@ -112,8 +133,7 @@ protocol Command {
 }
 
 class TextCommand: Command {
-    var text: String
-    
+    let text: String
     init(_ text: String) {
         self.text = text
     }
@@ -123,14 +143,14 @@ class TextCommand: Command {
     }
     
     func run() -> Bool {
-        return true
+        return false
     }
 }
 
 class NotifyCommand: Command {
-    var title = ""
-    var informativeText: String?
-    var makeSound = false
+    private var title = ""
+    private var informativeText: String?
+    private var makeSound = false
     
     func type() -> SupportedCommands {
         return .Notify
@@ -151,9 +171,16 @@ class NotifyCommand: Command {
 }
 
 class AskCommand: Command {
-    var title = ""
-    var informativeText: String?
-    var protected = false
+    private var title = ""
+    private var informativeText: String?
+    private var protected = false
+    
+    private let scriptsDir: String
+    private let outFifoName = "user_input_fifo"
+    
+    init(scriptsDir: String) {
+        self.scriptsDir = scriptsDir
+    }
     
     func type() -> SupportedCommands {
         return .Ask
@@ -169,10 +196,67 @@ class AskCommand: Command {
         
         let rect = NSMakeRect(0, 0, 250, 25)
         let input = protected ? NSSecureTextField(frame: rect) : NSTextField(frame: rect)
-        
         alert.accessoryView = input
+
+        let res = alert.runModal() == NSAlertFirstButtonReturn ? "OK" : "Cancel"
+        let toWrite = "\(res):\(input.stringValue)"
         
-        // TODO: Will this suffice?
-        return alert.runModal() == NSAlertFirstButtonReturn
+        let fullPath = "\(scriptsDir)/\(outFifoName)"
+        guard setupFifo(fullPath) else {
+            return false
+        }
+        
+        if let outFifo = NSFileHandle(forWritingAtPath: fullPath) {
+            outFifo.writeData(toWrite.dataUsingEncoding(NSUTF8StringEncoding)!)
+            return true
+        }
+        
+        return false
+    }
+    
+    private func setupFifo(path: String) -> Bool {
+        if !NSFileManager.defaultManager().fileExistsAtPath(path) {
+            if !FifoHelper.createFifo(path) {
+                NSLog("Failed to create fifo at '\(path)'")
+                return false
+            }
+        }
+        
+        return FifoHelper.isFifo(path)
+    }
+}
+
+class IconCommand: Command {
+    private let imgPath: String
+    var width = 0
+    var height = 0
+    
+    init(imagePath: String) {
+        imgPath = imagePath
+    }
+    
+    func type() -> SupportedCommands {
+        return .Icon
+    }
+    
+    func run() -> Bool {
+        return false
+    }
+    
+    func image() -> NSImage? {
+        if let img = NSImage(contentsOfFile: imgPath) {
+            let imgWidth = width == 0 ? img.size.width : CGFloat(width)
+            let imgHeight = height == 0 ? img.size.height : CGFloat(height)
+            let size = NSSize(width: imgWidth, height: imgHeight)
+            
+            if size != img.size {
+                img.size = size
+            }
+            
+            return img
+        }
+        
+        NSLog("Can't create image using URL: \(imgPath)")
+        return nil
     }
 }

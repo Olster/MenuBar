@@ -24,6 +24,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate {
     
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         statusItem.menu = menu
+        statusItem.button?.imagePosition = .ImageLeft
+        
         guard statusItem.button != nil else {
             NSLog("Can't get menuButton")
             return
@@ -61,9 +63,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate {
     }
     
     @IBAction func onQuit(sender: NSMenuItem) {
-        menuHandler.walkDir()
-        menuHandler.dump()
-        //NSApplication.sharedApplication().terminate(self)
+        //menuHandler.walkDir()
+        //menuHandler.dump()
+        
+        textProvider.stop()
+        NSApplication.sharedApplication().terminate(self)
     }
     
     @IBAction func onOpenScriptsFolder(sender: NSMenuItem) {
@@ -76,13 +80,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate {
         
         let lines = trimmed.componentsSeparatedByString("\n")
         for line in lines {
-            if let command = CommandFactory.createFromLine(line) {
-                
+            if let command = CommandFactory.createFromLine(line, scriptsDir: appSupportDir.path!) {
                 dispatch_async(dispatch_get_main_queue()) {
                     self.handleCommand(command)
                 }
             } else {
-                NSLog("Can't parse input: '\(line)'")
+                NSLog("Malformed input: '\(line)'")
             }
         }
     }
@@ -97,6 +100,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate {
             
             statusItem.button?.title = cmd.text
             
+        case .Icon:
+            guard let cmd = command as? IconCommand else {
+                NSLog("Invalid command: \(command)")
+                return
+            }
+            
+            statusItem.button?.image = cmd.image()
         default:
             command.run()
         }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CC4176D91D30FAF8006D089A /* FifoHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4176D81D30FAF8006D089A /* FifoHelper.swift */; };
 		F426B9A11CD0F98E00DF63B8 /* Command.swift in Sources */ = {isa = PBXBuildFile; fileRef = F426B9A01CD0F98E00DF63B8 /* Command.swift */; };
 		F482F29F1CC7B1FF00759523 /* CommandProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F482F29E1CC7B1FF00759523 /* CommandProvider.swift */; };
 		F482F2A11CC7C42000759523 /* default.sh in Resources */ = {isa = PBXBuildFile; fileRef = F482F2A01CC7C42000759523 /* default.sh */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CC4176D81D30FAF8006D089A /* FifoHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FifoHelper.swift; sourceTree = "<group>"; };
 		F426B9A01CD0F98E00DF63B8 /* Command.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Command.swift; sourceTree = "<group>"; };
 		F482F29E1CC7B1FF00759523 /* CommandProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommandProvider.swift; sourceTree = "<group>"; };
 		F482F2A01CC7C42000759523 /* default.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = default.sh; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 				F426B9A31CD243F500DF63B8 /* Handlers */,
 				F426B9A01CD0F98E00DF63B8 /* Command.swift */,
 				F482F29E1CC7B1FF00759523 /* CommandProvider.swift */,
+				CC4176D81D30FAF8006D089A /* FifoHelper.swift */,
 				F4D614C01CC79FAA00F5C7F8 /* Assets.xcassets */,
 				F4D614C21CC79FAA00F5C7F8 /* MainMenu.xib */,
 				F4D614C51CC79FAA00F5C7F8 /* Info.plist */,
@@ -158,6 +161,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4D614BF1CC79FAA00F5C7F8 /* AppDelegate.swift in Sources */,
+				CC4176D91D30FAF8006D089A /* FifoHelper.swift in Sources */,
 				F482F2BC1CC9065A00759523 /* MenuHandler.swift in Sources */,
 				F426B9A11CD0F98E00DF63B8 /* Command.swift in Sources */,
 				F482F29F1CC7B1FF00759523 /* CommandProvider.swift in Sources */,
@@ -267,6 +271,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Bar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				OTHER_SWIFT_FLAGS = "-DDEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pd.Bar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

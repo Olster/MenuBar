@@ -35,7 +35,7 @@ class CommandProvider {
     }
     
     deinit {
-        scriptRunner.terminate()
+        stop()
     }
     
     func start() -> Bool {
@@ -71,7 +71,21 @@ class CommandProvider {
         
         inputFifoHandle?.readabilityHandler = statusReadHandler
         scriptRunner.launch()
+        
+#if DEBUG
+        print("Started bash PID \(scriptRunner.processIdentifier)")
+#endif
+        
         return true
+    }
+    
+    func stop() {
+        if scriptRunner.running {            
+#if DEBUG
+            print("Terminating bash PID \(scriptRunner.processIdentifier)")
+#endif
+            scriptRunner.terminate()
+        }
     }
     
     private func setupScript(path: String) -> Bool {
@@ -98,12 +112,12 @@ class CommandProvider {
         if !NSFileManager.defaultManager().fileExistsAtPath(path) {
             NSLog("\(inputFifoName) doesn't exist in \(pathToFolder). Creating fifo")
             
-            if !createFifo(path) {
+            if !FifoHelper.createFifo(path) {
                 return false
             }
         }
         
-        if !isFifo(path) {
+        if !FifoHelper.isFifo(path) {
             NSLog("\(path) isn't a FIFO.")
             return false
         }
@@ -127,29 +141,5 @@ class CommandProvider {
         if let input = String(data: handle.availableData, encoding: NSUTF8StringEncoding) {
             delegate?.commandReceived(input)
         }
-    }
-    
-    // MARK: - FIFO related.
-    private func isFifo(path: String) -> Bool {
-        let cs = (path as NSString).UTF8String
-        var statPtr = stat()
-        let res = stat(cs, &statPtr)
-        if res != 0 {
-            NSLog("stat() returned \(res), errno: \(errno)")
-            return false
-        }
-        
-        return (statPtr.st_mode & S_IFMT) == S_IFIFO
-    }
-    
-    private func createFifo(path: String) -> Bool {
-        let cs = (path as NSString).UTF8String
-        let res = mkfifo(cs, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
-        if res != 0 {
-            NSLog("mkfifo returned \(res), errno: \(errno)")
-            return false
-        }
-        
-        return true
     }
 }
