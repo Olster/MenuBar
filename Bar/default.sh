@@ -12,37 +12,30 @@
 #
 # -----------------------------------------------------------------------------
 #
-# notify:text - creates a system notifications with text.
+# notify - creates a system notifications with text.
+# Arguments:
+#   informativeText - (Optional) Text displayed under main text. Usually an
+#                     explanation of the notification.
+#
+#   makeSound       - (Optional) Boolean whether to play a sound with notification.
+#                     Possible values: true, YES, 1.
 # Example: echo "notify:CPU temperature is critical" > menubar_fifo
 #
 # -----------------------------------------------------------------------------
 #
-# icon:path -- sets an icon in status bar from png image in path.
-#              Preferable resolution: 32x32.
-# Example: echo "icon:~/Documents/icon.png" > menubar_fifo
+# icon - sets an icon in status bar from png image in path.
+#
+# Example: echo -e "icon:~/Documents/icon.png\twidth:16\theight:16" > menubar_fifo
 #
 # -----------------------------------------------------------------------------
 #
-# prompt:question -- shows window with question and an edit field
-#                    for user input. User input is then sent to
-#                    user_input_fifo
+# ask:question -- shows window with question and an edit field for user input.
+#                 User input is then sent to user_input_fifo. "\tCANCEL\t" if cancelled.
 # Example:
-# echo "prompt:Please log in" > menubar_fifo
+# echo "ask:Please log in" > menubar_fifo
 # login=`cat user_input_fifo`
 # echo "Hi, $login"
 #
-# -----------------------------------------------------------------------------
-#
-# menu:title\thandler:script -- adds menu item with title to menu which calls
-#                               script when clicked. Script will block main thread.
-# Example:
-# echo -e "menu:Show my IP\thandler:show_ip.sh" > menubar_fifo
-# Keep in mind that you need to use '-e' argument so echo interprets special chars.
-# In show_ip.sh you can write a script that will do:
-# echo "notify:`ifconfig en0 | grep 'inet ' | awk '{ print $2 }'`" > menubar_fifo
-# This will show a notification with your ip.
-#
-# menu:\tclear: -- removes all menu items added by user.
 
 while true; do
     top -l 1 | head -n 7 | tail -n 1 | awk {' print "Memory used:", $2 ". Free:", $6 '} > menubar_fifo
