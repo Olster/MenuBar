@@ -9,23 +9,19 @@
 import Cocoa
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate {
-    @IBOutlet weak var menu: NSMenu!
-    
+class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate, MenuDelegate {    
     let statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(NSVariableStatusItemLength)
     
     // Reads commands from user.
     var textProvider: CommandProvider!
     
-    // Handles menus created ny user.
-    var menuHandler: MenuHandler!
+    // Menus created ny user.
+    var menuHandler: Menu!
     
+    // ~/Library/Application Support/[bundle-id]
     var appSupportDir: NSURL!
     
     func applicationDidFinishLaunching(aNotification: NSNotification) {
-        statusItem.menu = menu
-        statusItem.button?.imagePosition = .ImageLeft
-        
         guard statusItem.button != nil else {
             NSLog("Can't get menuButton")
             return
@@ -35,11 +31,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate {
             return
         }
         
+        menuHandler = Menu(scriptsDir: appSupportDir)
+        menuHandler.delegate = self
+        
+        statusItem.menu = menuHandler.menu
+        statusItem.button?.imagePosition = .ImageLeft
+        
         textProvider = CommandProvider(pathToFolder: appSupportDir.path!)
         textProvider.delegate = self
         textProvider.start()
-        
-        menuHandler = MenuHandler(pathToFolder: appSupportDir.path!, menu: menu)
     }
     
     func setUpApplicationSupportDir() -> Bool {
@@ -62,19 +62,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate {
         return false
     }
     
-    @IBAction func onQuit(sender: NSMenuItem) {
-        //menuHandler.walkDir()
-        //menuHandler.dump()
-        
+    // MARK: MenuDelegate impl.
+    func onQuit() {
         textProvider.stop()
         NSApplication.sharedApplication().terminate(self)
     }
     
-    @IBAction func onOpenScriptsFolder(sender: NSMenuItem) {
-        NSWorkspace.sharedWorkspace().openURL(appSupportDir)
-    }
-    
-    // MARK: - CommandProviderDelegate impl.
+    // MARK: CommandProviderDelegate impl.
     func commandReceived(text: String) {
         let trimmed = text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         

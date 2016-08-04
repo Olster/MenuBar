@@ -1,6 +1,7 @@
 #### Description of supported commands
 ##### Text
-Default command. Called when it's an unrecognized command or no command at all.
+Default command.  
+Called when it's an unrecognized command or no command at all.
 
 Example:
 ```
@@ -8,7 +9,7 @@ date > menubar_fifo
 ```
 
 ##### Notify
-`notify` command.
+`notify` command.  
 Creates a system notification.
 
 - Parameters:
@@ -21,8 +22,8 @@ echo "notify:CPU temperature is critical" > menubar_fifo
 ```
 
 ##### Ask
-`ask` command.
-Shows a window with a prompt and edit field. User input is then sent to user_input_fifo. "\tCANCEL\t" if cancelled.
+`ask` command.  
+Shows a window with a prompt and edit field. User input is then sent to user_input_fifo. ``"\tCANCEL\t"`` if cancelled.
 
 - Parameters:
   - informativeText: (Optional) Text displayed under main text. Usually an explanation of what is asked.
@@ -36,7 +37,7 @@ echo "Hi, $login"
 ```
 
 ##### Icon
-`icon` command.
+`icon` command.  
 Sets an icon in system bar.
 
 - Parameters:

@@ -9,6 +9,43 @@
 import Cocoa
 import Foundation
 
+protocol MenuDelegate {
+    func onQuit()
+}
+
+class Menu: NSObject {
+    let menu = NSMenu()
+    private let scriptsDir: NSURL
+    var delegate: MenuDelegate?
+    
+    init(scriptsDir: NSURL) {
+        self.scriptsDir = scriptsDir
+        
+        super.init()
+        
+        // Open scripts dir
+        let scriptItem = NSMenuItem(title: "Open scripts dir", action: #selector(onOpenScriptsDir), keyEquivalent: "")
+        scriptItem.target = self
+        menu.addItem(scriptItem)
+        
+        // Quit item
+        menu.addItem(NSMenuItem.separatorItem())
+        let quitItem = NSMenuItem(title: "Quit", action: #selector(Menu.onQuit), keyEquivalent: "")
+        quitItem.target = self
+        menu.addItem(quitItem)
+    }
+    
+    @objc private func onOpenScriptsDir() {
+        NSWorkspace.sharedWorkspace().openURL(scriptsDir)
+    }
+    
+    @objc private func onQuit() {
+        print("Quitting")
+        delegate?.onQuit()
+    }
+}
+
+/*
 class MenuHandler: NSObject {
     private var pathToFolder: String
     var menu: NSMenu
@@ -70,3 +107,4 @@ class MenuHandler: NSObject {
         }
     }
 }
+*/

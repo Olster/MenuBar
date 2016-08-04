@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
@@ -12,29 +12,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Bar" customModuleProvider="target">
-            <connections>
-                <outlet property="menu" destination="Joh-wd-L8o" id="I9y-8s-ycN"/>
-            </connections>
-        </customObject>
+        <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Bar" customModuleProvider="target"/>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
-        <menu id="Joh-wd-L8o">
-            <items>
-                <menuItem title="Open scripts folder" id="SAV-ET-XWO">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="onOpenScriptsFolder:" target="Voe-Tx-rLC" id="Q0K-ZZ-btv"/>
-                    </connections>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="2cn-Lv-JeD"/>
-                <menuItem title="Quit" id="Pl9-De-Cik">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="onQuit:" target="Voe-Tx-rLC" id="Tz7-OI-JfJ"/>
-                    </connections>
-                </menuItem>
-            </items>
-            <point key="canvasLocation" x="265.5" y="535.5"/>
-        </menu>
     </objects>
 </document>
