@@ -10,6 +10,7 @@ import Cocoa
 import Foundation
 
 protocol MenuDelegate {
+    func onRestartScript()
     func onQuit()
 }
 
@@ -28,11 +29,20 @@ class Menu: NSObject {
         scriptItem.target = self
         menu.addItem(scriptItem)
         
+        // Restart script.
+        let restartScriptItem = NSMenuItem(title: "Restart script", action: #selector(onRestartScript), keyEquivalent: "")
+        restartScriptItem.target = self
+        menu.addItem(restartScriptItem)
+        
         // Quit item
         menu.addItem(NSMenuItem.separatorItem())
         let quitItem = NSMenuItem(title: "Quit", action: #selector(Menu.onQuit), keyEquivalent: "")
         quitItem.target = self
         menu.addItem(quitItem)
+    }
+    
+    @objc private func onRestartScript() {
+        delegate?.onRestartScript()
     }
     
     @objc private func onOpenScriptsDir() {

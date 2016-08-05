@@ -110,6 +110,7 @@
 				TargetAttributes = {
 					F4D614BA1CC79FAA00F5C7F8 = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = QBF23XDQ3H;
 					};
 				};
 			};
@@ -255,10 +256,10 @@
 		F4D614C91CC79FAA00F5C7F8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Bar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_SWIFT_FLAGS = "-DDEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pd.Bar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -268,10 +269,10 @@
 		F4D614CA1CC79FAA00F5C7F8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Bar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pd.Bar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
