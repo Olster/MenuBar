@@ -34,6 +34,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate, Men
         menuHandler = Menu(scriptsDir: appSupportDir)
         menuHandler.delegate = self
         
+        print(menuHandler.dump())
+        
         statusItem.menu = menuHandler.menu
         statusItem.button?.imagePosition = .ImageLeft
         
@@ -66,6 +68,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate, Men
     func onQuit() {
         textProvider.stop()
         NSApplication.sharedApplication().terminate(self)
+    }
+    
+    func onRestartScript() {
+        // TODO
     }
     
     // MARK: CommandProviderDelegate impl.
