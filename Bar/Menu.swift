@@ -18,11 +18,24 @@ class Menu: NSObject {
     let menu = NSMenu()
     private let scriptsDir: NSURL
     var delegate: MenuDelegate?
+    var customMenus: [MenuFileInfo]?
     
     init(scriptsDir: NSURL) {
         self.scriptsDir = scriptsDir
         super.init()
-        
+    }
+    
+    func dump() -> String {
+        let menusUrl = scriptsDir.URLByAppendingPathComponent("menus", isDirectory: true)
+        return MenuFileInfo.createFrom(menusUrl)?.map {"\($0)"}.joinWithSeparator("\n\t") ?? "NONE"
+    }
+    
+    func cleanUp() {
+        // This deinits all menus.
+        customMenus = nil
+    }
+    
+    func setUpMenus() {
         // Open scripts dir
         let scriptItem = NSMenuItem(title: "Open scripts dir", action: #selector(onOpenScriptsDir), keyEquivalent: "")
         scriptItem.target = self
@@ -45,21 +58,19 @@ class Menu: NSObject {
         menu.addItem(quitItem)
     }
     
-    func dump() -> String {
-        let menusUrl = scriptsDir.URLByAppendingPathComponent("menus", isDirectory: true)
-        return MenuFileInfo.createFrom(menusUrl)?.map {"\($0)"}.joinWithSeparator("\n\t") ?? "NONE"
-    }
-    
     private func setUpCustomMenus() {
         let menusUrl = scriptsDir.URLByAppendingPathComponent("menus", isDirectory: true)
-        if let menus = MenuFileInfo.createFrom(menusUrl) {
-            addMenus(menu, menus: menus)
+        customMenus = MenuFileInfo.createFrom(menusUrl)
+        if customMenus != nil {
+            addMenus(menu, menus: customMenus!)
         }
     }
     
     private func addMenus(addTo: NSMenu, menus: [MenuFileInfo]) {
         for m in menus {
-            let item = NSMenuItem(title: m.name, action: nil, keyEquivalent: "")
+            let item = NSMenuItem(title: m.name, action: #selector(m.handleMenu), keyEquivalent: "")
+            item.target = m
+            
             addTo.addItem(item)
             
             if m.submenus != nil {
@@ -84,12 +95,14 @@ class Menu: NSObject {
     }
 }
 
-class MenuFileInfo: CustomStringConvertible {
+class MenuFileInfo: NSObject {
     let name: String
     let isDirectory: Bool
     let URLPath: NSURL
     let isReadable: Bool
     var submenus: [MenuFileInfo]?
+    
+    var runner = NSTask()
     
     static func createFrom(path: NSURL) -> [MenuFileInfo]? {
         if !NSFileManager.defaultManager().fileExistsAtPath(path.path!) {
@@ -129,7 +142,7 @@ class MenuFileInfo: CustomStringConvertible {
         return true
     }
     
-    var description: String {
+    override var description: String {
         var str = ""
         if submenus != nil {
             str = "\n\tSubmenus:\n\t" + submenus!.map {"\($0)"}.joinWithSeparator("\n\t")
@@ -143,69 +156,36 @@ class MenuFileInfo: CustomStringConvertible {
         isDirectory = isDir
         URLPath = url
         self.isReadable = isReadable
+        super.init()
+    }
+    
+    deinit {
+        if runner.running {
+            runner.terminate()
+        }
+    }
+    
+    @objc private func handleMenu() {
+        print("TODO: Starting \(URLPath)")
+//        if runner.running {
+//            runner.terminate()
+//        }
+//        
+//        runner = NSTask()
+//        runner.arguments = [URLPath.path!]
+//        runner.launchPath = "/bin/bash"
+//        runner.currentDirectoryPath = URLPath.URLByDeletingLastPathComponent!.path!
+//        
+//        let stdout = NSPipe()
+//        runner.standardOutput = stdout
+//        runner.standardError = stdout
+//        
+//        stdout.fileHandleForReading.readabilityHandler = { handle in
+//            if let out = String(data: handle.availableData, encoding: NSUTF8StringEncoding) {
+//                NSLog("Menu script out: " + out)
+//            }
+//        }
+//        
+//        runner.launch()
     }
 }
-
-/*
-class MenuHandler: NSObject {
-    private var pathToFolder: String
-    var menu: NSMenu
-    
-    var itemHandler = [Int: String]()
-    let startingTag = 1
-    var lastTag: Int
-    
-    init(pathToFolder: String, menu: NSMenu) {
-        self.pathToFolder = pathToFolder
-        self.menu = menu
-        
-        lastTag = startingTag
-    }
-    
-    func walkDir() {
-        let dirToWalk = pathToFolder + "/menu"
-        guard NSFileManager.defaultManager().fileExistsAtPath(dirToWalk) else {
-            NSLog("Directory '\(dirToWalk)' doesn't exist")
-            return
-        }
-        
-        let enumerator = NSFileManager.defaultManager().enumeratorAtPath(dirToWalk)
-        while let fileName = enumerator?.nextObject() as? String {
-            
-            // Skip directories.
-            if let val = enumerator?.fileAttributes?[NSFileType] as? String {
-                if val == NSFileTypeDirectory {
-                    continue
-                }
-            }
-            
-            var menuItemTitle = fileName
-            if fileName.hasSuffix(".sh") {
-                let index = fileName.endIndex.advancedBy(-3)
-                menuItemTitle = fileName.substringToIndex(index)
-            }
-            
-            let selector = #selector(MenuHandler.itemAction(_:))
-            let item = NSMenuItem(title: menuItemTitle, action: selector, keyEquivalent: "")
-            item.tag = lastTag
-            item.target = self
-            
-            menu.addItem(item)
-            
-            let path = dirToWalk + "/" + fileName
-            itemHandler[lastTag] = path
-            lastTag += 1
-        }
-    }
-    
-    func dump() {
-        print(itemHandler)
-    }
-    
-    func itemAction(sender: NSMenuItem) {
-        if let handler = itemHandler[sender.tag] {
-            print(handler)
-        }
-    }
-}
-*/
