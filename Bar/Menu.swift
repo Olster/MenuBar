@@ -47,9 +47,9 @@ class Menu: NSObject {
         menu.addItem(scriptItem)
         
         // Restart script.
-        let restartScriptItem = NSMenuItem(title: "Restart script (WIP)", action: #selector(onRestartScript), keyEquivalent: "")
-        restartScriptItem.target = self
-        menu.addItem(restartScriptItem)
+//        let restartScriptItem = NSMenuItem(title: "Restart script (WIP)", action: #selector(onRestartScript), keyEquivalent: "")
+//        restartScriptItem.target = self
+//        menu.addItem(restartScriptItem)
         menu.addItem(NSMenuItem.separatorItem())
         
         // Add menus from folder.

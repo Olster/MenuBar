@@ -56,7 +56,13 @@ Example:
 echo -e "icon:icon.png\twidth:16\theight:16" > menubar_fifo
 ```
 
+#### Custom menus
+To create custom menu, click on your menu bar -> "Open scripts dir", Finder window will open.  
+Create directory "menus" and place shell scripts inside it. Then restart the Bar application (see TODO: there will be a button/command/automatic, some way to rescan custom menus).  
+Menu item will have the name of the shell file.
+
 #### TODO
 1. Restart script handler.
 2. Rescan menus.
 3. Examples with more sophisticated commands.
+4. How to create menus.
