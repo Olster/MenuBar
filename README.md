@@ -1,4 +1,11 @@
 #### Description of supported commands
+Parameters are passed using '\t' in the command text.  
+If you're using `echo`, specify `-e` argument so it handles escape characters.  
+For example:  
+```
+echo -e "notify:Hello\tinformativeText:This is a text" > menubar_fifo
+```
+
 ##### Text
 Default command.  
 Called when it's an unrecognized command or no command at all.
@@ -48,3 +55,8 @@ Example:
 ```
 echo -e "icon:icon.png\twidth:16\theight:16" > menubar_fifo
 ```
+
+#### TODO
+1. Restart script handler.
+2. Rescan menus.
+3. Examples with more sophisticated commands.

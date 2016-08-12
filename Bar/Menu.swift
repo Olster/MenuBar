@@ -31,8 +31,13 @@ class Menu: NSObject {
     }
     
     func cleanUp() {
-        // This deinits all menus.
-        customMenus = nil
+        if customMenus != nil {
+            for menu in customMenus! {
+                menu.cleanUp()
+            }
+            
+            customMenus = nil
+        }
     }
     
     func setUpMenus() {
@@ -42,7 +47,7 @@ class Menu: NSObject {
         menu.addItem(scriptItem)
         
         // Restart script.
-        let restartScriptItem = NSMenuItem(title: "Restart script", action: #selector(onRestartScript), keyEquivalent: "")
+        let restartScriptItem = NSMenuItem(title: "Restart script (WIP)", action: #selector(onRestartScript), keyEquivalent: "")
         restartScriptItem.target = self
         menu.addItem(restartScriptItem)
         menu.addItem(NSMenuItem.separatorItem())
@@ -160,32 +165,51 @@ class MenuFileInfo: NSObject {
     }
     
     deinit {
+        cleanUp()
+    }
+    
+    func cleanUp() {
         if runner.running {
             runner.terminate()
+        }
+        
+        if submenus != nil {
+            for menu in submenus! {
+                menu.cleanUp()
+            }
+            
+            submenus = nil
         }
     }
     
     @objc private func handleMenu() {
-        print("TODO: Starting \(URLPath)")
-//        if runner.running {
-//            runner.terminate()
-//        }
-//        
-//        runner = NSTask()
-//        runner.arguments = [URLPath.path!]
-//        runner.launchPath = "/bin/bash"
-//        runner.currentDirectoryPath = URLPath.URLByDeletingLastPathComponent!.path!
-//        
-//        let stdout = NSPipe()
-//        runner.standardOutput = stdout
-//        runner.standardError = stdout
-//        
-//        stdout.fileHandleForReading.readabilityHandler = { handle in
-//            if let out = String(data: handle.availableData, encoding: NSUTF8StringEncoding) {
-//                NSLog("Menu script out: " + out)
-//            }
-//        }
-//        
-//        runner.launch()
+        print("Starting \(URLPath)")
+        // Dispatching to another queue for possible long operations. Otherwise the app would
+        // appear to be hanging.
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+            if self.runner.running {
+                self.runner.terminate()
+            }
+            
+            self.runner = NSTask()
+            self.runner.arguments = [self.URLPath.path!]
+            self.runner.launchPath = "/bin/bash"
+            self.runner.currentDirectoryPath = self.URLPath.URLByDeletingLastPathComponent!.path!
+            
+            let stdout = NSPipe()
+            self.runner.standardOutput = stdout
+            self.runner.standardError = stdout
+            stdout.fileHandleForReading.readabilityHandler = self.menuOutHandler
+            self.runner.launch()
+            self.runner.waitUntilExit()
+            
+            stdout.fileHandleForReading.readabilityHandler = nil
+        }
+    }
+    
+    private func menuOutHandler(handle: NSFileHandle) {
+        if let out = String(data: handle.availableData, encoding: NSUTF8StringEncoding) {
+            NSLog("Menu script out: " + out)
+        }
     }
 }
