@@ -74,7 +74,9 @@
 #3. Examples with more sophisticated commands.
 #4. How to create menus.
 
+echo -e "To change the default script, click on your menu bar -> \"Open Scripts dir\" and change default.sh\nYou will also find a short manual on supported commands and features" | open -f
+
 while true; do
-    top -l 1 | head -n 7 | tail -n 1 | awk {' print "Memory used:", $2 ". Free:", $6 '} > menubar_fifo
+    top -l 1 | head -n 7 | tail -n 1 | awk {' print "Free RAM:", $6 '} > menubar_fifo
     sleep 30
 done

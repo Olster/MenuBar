@@ -11,11 +11,12 @@ import Foundation
 
 protocol MenuDelegate {
     func onRestartScript()
+    func onRescanMenu()
     func onQuit()
 }
 
 class Menu: NSObject {
-    let menu = NSMenu()
+    private(set) var menu = NSMenu()
     private let scriptsDir: NSURL
     var delegate: MenuDelegate?
     var customMenus: [MenuFileInfo]?
@@ -32,12 +33,14 @@ class Menu: NSObject {
     
     func cleanUp() {
         if customMenus != nil {
-            for menu in customMenus! {
-                menu.cleanUp()
+            for m in customMenus! {
+                m.cleanUp()
             }
             
             customMenus = nil
         }
+        
+        menu = NSMenu()
     }
     
     func setUpMenus() {
@@ -47,9 +50,14 @@ class Menu: NSObject {
         menu.addItem(scriptItem)
         
         // Restart script.
-//        let restartScriptItem = NSMenuItem(title: "Restart script (WIP)", action: #selector(onRestartScript), keyEquivalent: "")
-//        restartScriptItem.target = self
-//        menu.addItem(restartScriptItem)
+        let restartScriptItem = NSMenuItem(title: "Restart script", action: #selector(onRestartScript), keyEquivalent: "")
+        restartScriptItem.target = self
+        menu.addItem(restartScriptItem)
+        
+        // Rescan menus
+        let rescanMenus = NSMenuItem(title: "Recan custom menus", action: #selector(onRescanMenus), keyEquivalent: "")
+        rescanMenus.target = self
+        menu.addItem(rescanMenus)
         menu.addItem(NSMenuItem.separatorItem())
         
         // Add menus from folder.
@@ -58,7 +66,7 @@ class Menu: NSObject {
         
         // Quit item
         menu.addItem(NSMenuItem.separatorItem())
-        let quitItem = NSMenuItem(title: "Quit", action: #selector(Menu.onQuit), keyEquivalent: "")
+        let quitItem = NSMenuItem(title: "Quit", action: #selector(onQuit), keyEquivalent: "")
         quitItem.target = self
         menu.addItem(quitItem)
     }
@@ -90,12 +98,15 @@ class Menu: NSObject {
         delegate?.onRestartScript()
     }
     
+    @objc private func onRescanMenus() {
+        delegate?.onRescanMenu()
+    }
+    
     @objc private func onOpenScriptsDir() {
         NSWorkspace.sharedWorkspace().openURL(scriptsDir)
     }
     
     @objc private func onQuit() {
-        print("Quitting")
         delegate?.onQuit()
     }
 }

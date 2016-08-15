@@ -16,7 +16,7 @@ class CommandProvider {
     private let scriptName = "default.sh"
     private let inputFifoName = "menubar_fifo"
     
-    private let scriptRunner = NSTask()
+    private var scriptRunner = NSTask()
     private let pathToFolder: String
     
     private var inputFifoHandle: NSFileHandle?
@@ -30,8 +30,6 @@ class CommandProvider {
     init(pathToFolder: String) {
         self.pathToFolder = pathToFolder
         print("Setting task path: \(pathToFolder)")
-        scriptRunner.currentDirectoryPath = pathToFolder
-        scriptRunner.launchPath = "/bin/bash"
     }
     
     deinit {
@@ -39,6 +37,10 @@ class CommandProvider {
     }
     
     func start() -> Bool {
+        scriptRunner = NSTask()
+        scriptRunner.currentDirectoryPath = pathToFolder
+        scriptRunner.launchPath = "/bin/bash"
+        
         // Set up script runner.
         let script = String(format: "%@/%@", pathToFolder, scriptName)
         guard setupScript(script) else {

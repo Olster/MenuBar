@@ -71,8 +71,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, CommandProviderDelegate, Men
     }
     
     func onRestartScript() {
-        // TODO
-        print("TODO: Restart script")
+        NSLog("Restarting script")
+        textProvider.stop()
+        textProvider.start()
+    }
+    
+    func onRescanMenu() {
+        NSLog("Rescanning menus")
+        menuHandler.cleanUp()
+        menuHandler.setUpMenus()
+        statusItem.menu = menuHandler.menu
     }
     
     // MARK: CommandProviderDelegate impl.
