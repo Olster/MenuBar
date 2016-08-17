@@ -194,7 +194,10 @@ class MenuFileInfo: NSObject {
     }
     
     @objc private func handleMenu() {
-        print("Starting \(URLPath)")
+        #if DEBUG
+        NSLog("Starting \(URLPath)")
+        #endif
+        
         // Dispatching to another queue for possible long operations. Otherwise the app would
         // appear to be hanging.
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
@@ -220,7 +223,7 @@ class MenuFileInfo: NSObject {
     
     private func menuOutHandler(handle: NSFileHandle) {
         if let out = String(data: handle.availableData, encoding: NSUTF8StringEncoding) {
-            NSLog("Menu script out: " + out)
+            NSLog("Menu script out/err: " + out)
         }
     }
 }
