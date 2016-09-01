@@ -195,7 +195,7 @@ class MenuFileInfo: NSObject {
     
     @objc private func handleMenu() {
         #if DEBUG
-        NSLog("Starting \(URLPath)")
+        NSLog("Starting \(URLPath.path!)")
         #endif
         
         // Dispatching to another queue for possible long operations. Otherwise the app would
